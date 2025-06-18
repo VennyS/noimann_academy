@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:noimann_academy/widgets/webview/webview_mobile_macos.dart';
 import 'package:noimann_academy/widgets/webview/webview_windows.dart';
 
 class WebViewWidget extends StatefulWidget {
@@ -28,6 +29,15 @@ class WebViewWidgetState extends State<WebViewWidget> {
         onLoadingChanged: widget.onLoadingChanged,
       );
     }
+
+    if (Platform.isAndroid || Platform.isMacOS || Platform.isIOS) {
+      return WebviewMobile(
+        baseProtocol: widget.baseProtocol,
+        baseHost: widget.baseHost,
+        onLoadingChanged: widget.onLoadingChanged,
+      );
+    }
+
     // Placeholder for other platforms
     return const Center(child: Text('Platform not supported yet'));
   }
