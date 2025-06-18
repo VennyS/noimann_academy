@@ -25,22 +25,6 @@ Noimann Academy — кроссплатформенное приложение н
 - **Проверка сети**: Используется `connectivity_plus` для отслеживания состояния интернета. При отсутствии сети отображается `NoInternetWidget`.
 - **Состояние загрузки**: Callback `onLoadingChanged` сообщает родительскому виджету, когда WebView начинает или завершает загрузку.
 
-## Зависимости
-
-- `flutter`: SDK для кроссплатформенной разработки.
-- `webview_windows: ^0.2.2`: Для WebView на Windows.
-- `connectivity_plus: ^6.0.0`: Для проверки состояния сети.
-
-Добавьте в `pubspec.yaml`:
-
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  webview_windows: ^0.2.2
-  connectivity_plus: ^6.0.0
-```
-
 ## Запуск
 
 ### Требования
