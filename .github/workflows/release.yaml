@@ -1,4 +1,4 @@
-name: Flutter Multi‑Platform Release
+name: Flutter Multi-Platform Release
 
 on:
   push:
@@ -6,8 +6,7 @@ on:
       - "v*.*.*" # Триада версий, например v1.2.3
 
 env:
-  # Обнови при необходимости
-  FLUTTER_VERSION: "3.22.0"
+  FLUTTER_VERSION: "3.32.4" # Обновлено до версии с Dart SDK >= 3.7.2
 
 jobs:
   # -------------------- ANDROID --------------------
@@ -23,11 +22,11 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable # Явно указываем стабильный канал
 
       - name: Install dependencies
         run: flutter pub get
 
-      # Собираем release‑сборки
       - name: Build .aab (Play Store)
         run: flutter build appbundle --release
 
@@ -55,6 +54,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
 
       - name: Enable Windows desktop
         run: flutter config --enable-windows-desktop
@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-release
-          path: build/windows/runner/Release
+          path: build/windows/x64/runner/Release # Уточнён путь для Windows
 
   # -------------------- macOS --------------------
   build-macos:
@@ -84,6 +84,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
 
       - name: Enable macOS desktop
         run: flutter config --enable-macos-desktop
@@ -104,7 +105,6 @@ jobs:
   build-ios:
     name: Build · iOS
     runs-on: macos-latest
-    # macOS раннеры ограничены по минутам, следи за лимитом
 
     steps:
       - name: Checkout
@@ -114,11 +114,11 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
 
       - name: Install dependencies
         run: flutter pub get
 
-      # ⚠️ Если нужны подписанные .ipa, интегрируй fastlane + сертификаты в secrets.
       - name: Build unsigned .ipa
         run: flutter build ipa --release --no-codesign
 
@@ -154,4 +154,4 @@ jobs:
             artifacts/macos-release/**
             artifacts/ios-release/**
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Доступен по умолчанию
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
