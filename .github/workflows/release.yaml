@@ -1,0 +1,157 @@
+name: Flutter Multi‑Platform Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Триада версий, например v1.2.3
+
+env:
+  # Обнови при необходимости
+  FLUTTER_VERSION: "3.22.0"
+
+jobs:
+  # -------------------- ANDROID --------------------
+  build-android:
+    name: Build · Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Собираем release‑сборки
+      - name: Build .aab (Play Store)
+        run: flutter build appbundle --release
+
+      - name: Build .apk (sideload)
+        run: flutter build apk --release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/flutter-apk/app-release.apk
+
+  # -------------------- WINDOWS --------------------
+  build-windows:
+    name: Build · Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows (MSIX)
+        run: flutter build windows --release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: build/windows/runner/Release
+
+  # -------------------- macOS --------------------
+  build-macos:
+    name: Build · macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Enable macOS desktop
+        run: flutter config --enable-macos-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build macOS (Universal)
+        run: flutter build macos --release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-release
+          path: build/macos/Build/Products/Release
+
+  # -------------------- iOS --------------------
+  build-ios:
+    name: Build · iOS
+    runs-on: macos-latest
+    # macOS раннеры ограничены по минутам, следи за лимитом
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # ⚠️ Если нужны подписанные .ipa, интегрируй fastlane + сертификаты в secrets.
+      - name: Build unsigned .ipa
+        run: flutter build ipa --release --no-codesign
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release
+          path: build/ios/ipa/*.ipa
+
+  # -------------------- RELEASE --------------------
+  release:
+    name: Publish Release
+    needs:
+      - build-android
+      - build-windows
+      - build-macos
+      - build-ios
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          files: |
+            artifacts/android-release/**
+            artifacts/windows-release/**
+            artifacts/macos-release/**
+            artifacts/ios-release/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Доступен по умолчанию
