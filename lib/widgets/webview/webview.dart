@@ -38,7 +38,6 @@ class WebViewWidgetState extends State<WebViewWidget> {
       );
     }
 
-    // Placeholder for other platforms
-    return const Center(child: Text('Platform not supported yet'));
+    return const Center(child: Text('Платформа ещё не поддерживается'));
   }
 }

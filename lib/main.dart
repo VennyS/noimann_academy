@@ -39,7 +39,6 @@ class MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _checkInternet();
-    // Listen for connectivity changes
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
       results,
     ) {
