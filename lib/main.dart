@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:noimann_academy/constants.dart';
+import 'package:noimann_academy/widgets/floating_bar/floating_bar.dart';
 import 'package:noimann_academy/widgets/no_internet/no_internet.dart';
 import 'package:noimann_academy/widgets/splash_screen/splash_screen.dart';
 import 'package:noimann_academy/widgets/webview/webview.dart';
@@ -83,6 +84,12 @@ class MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  FloatingBar? buildFloatingbar() {
+    if (_hasInternet && !_isWebViewLoading && !_hasLoadingError) return null;
+
+    return FloatingBar(onGoBack: _goBack, onRefresh: _refresh);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,22 +116,7 @@ class MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton:
-          _hasInternet && !_isWebViewLoading && !_hasLoadingError
-              ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: _goBack,
-                      icon: Icon(Icons.arrow_back),
-                    ),
-                    IconButton(onPressed: _refresh, icon: Icon(Icons.refresh)),
-                  ],
-                ),
-              )
-              : null,
+      floatingActionButton: buildFloatingbar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
