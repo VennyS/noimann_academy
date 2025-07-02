@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:noimann_academy/lib/check_site_is_reacheble.dart';
 import 'package:webview_windows/webview_windows.dart';
 
 class WebviewWindows extends StatefulWidget {
@@ -7,10 +8,12 @@ class WebviewWindows extends StatefulWidget {
     required this.baseProtocol,
     required this.baseHost,
     required this.onLoadingChanged,
+    required this.onError,
   });
   final String baseProtocol;
   final String baseHost;
   final ValueChanged<bool> onLoadingChanged;
+  final ValueChanged<bool> onError;
 
   @override
   WebviewWindowsState createState() => WebviewWindowsState();
@@ -29,7 +32,15 @@ class WebviewWindowsState extends State<WebviewWindows> {
 
   Future<void> _initWebView() async {
     try {
+      final isReachable = await checkSiteIsReachable(_currentUrl);
+
+      if (!isReachable) {
+        widget.onError(true);
+        return;
+      }
+
       await _controller.initialize();
+
       _controller.url.listen((url) {
         setState(() {
           _currentUrl = url;
@@ -48,6 +59,7 @@ class WebviewWindowsState extends State<WebviewWindows> {
       await _controller.loadUrl(_currentUrl);
     } catch (e) {
       print('Error initializing WebView: $e');
+      widget.onError(true);
     }
   }
 

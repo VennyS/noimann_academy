@@ -38,6 +38,7 @@ dependencies:
   webview_flutter: ^4.13.0
   connectivity_plus: ^6.1.4
   flutter_native_splash: ^2.4.6
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:

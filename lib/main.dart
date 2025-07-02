@@ -36,6 +36,7 @@ class MyHomePageState extends State<MyHomePage> {
 
   bool _isWebViewLoading = true;
   bool _hasInternet = true;
+  bool _hasLoadingError = true;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   @override
@@ -70,6 +71,18 @@ class MyHomePageState extends State<MyHomePage> {
     _webViewKey.currentState?.reload();
   }
 
+  void onLoadingChanged(bool isLoading) {
+    setState(() {
+      _isWebViewLoading = isLoading;
+    });
+  }
+
+  void onError(bool isError) {
+    setState(() {
+      _hasLoadingError = isError;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,16 +92,13 @@ class MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: Stack(
                 children: [
-                  if (_hasInternet)
+                  if (_hasInternet && !_hasLoadingError)
                     WebViewWidget(
                       key: _webViewKey,
                       baseProtocol: baseProtocol,
                       baseHost: baseHost,
-                      onLoadingChanged: (isLoading) {
-                        setState(() {
-                          _isWebViewLoading = isLoading;
-                        });
-                      },
+                      onLoadingChanged: onLoadingChanged,
+                      onError: onError,
                     )
                   else
                     const NoInternetWidget(),
@@ -100,7 +110,7 @@ class MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton:
-          _hasInternet && !_isWebViewLoading
+          _hasInternet && !_isWebViewLoading && !_hasLoadingError
               ? Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(

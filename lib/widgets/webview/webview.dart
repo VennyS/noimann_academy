@@ -10,10 +10,12 @@ class WebViewWidget extends StatefulWidget {
     required this.baseProtocol,
     required this.baseHost,
     required this.onLoadingChanged,
+    required this.onError,
   });
   final String baseProtocol;
   final String baseHost;
   final ValueChanged<bool> onLoadingChanged;
+  final ValueChanged<bool> onError;
 
   @override
   WebViewWidgetState createState() => WebViewWidgetState();
@@ -47,6 +49,7 @@ class WebViewWidgetState extends State<WebViewWidget> {
         baseProtocol: widget.baseProtocol,
         baseHost: widget.baseHost,
         onLoadingChanged: widget.onLoadingChanged,
+        onError: widget.onError,
       );
     }
 
@@ -56,6 +59,7 @@ class WebViewWidgetState extends State<WebViewWidget> {
         baseProtocol: widget.baseProtocol,
         baseHost: widget.baseHost,
         onLoadingChanged: widget.onLoadingChanged,
+        onError: widget.onError,
       );
     }
 

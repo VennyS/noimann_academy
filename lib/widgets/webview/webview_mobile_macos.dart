@@ -7,10 +7,12 @@ class WebviewMobile extends StatefulWidget {
     required this.baseProtocol,
     required this.baseHost,
     required this.onLoadingChanged,
+    required this.onError,
   });
   final String baseProtocol;
   final String baseHost;
   final ValueChanged<bool> onLoadingChanged;
+  final ValueChanged<bool> onError;
 
   @override
   WebviewMobileState createState() => WebviewMobileState();
@@ -28,6 +30,7 @@ class WebviewMobileState extends State<WebviewMobile> {
           ..setNavigationDelegate(
             NavigationDelegate(
               onPageStarted: (url) {
+                widget.onError(false);
                 widget.onLoadingChanged(true);
               },
               onPageFinished: (url) {
@@ -35,6 +38,7 @@ class WebviewMobileState extends State<WebviewMobile> {
               },
               onWebResourceError: (error) {
                 widget.onLoadingChanged(false);
+                widget.onError(true);
               },
               onNavigationRequest: (request) {
                 final uri = Uri.parse(request.url);
