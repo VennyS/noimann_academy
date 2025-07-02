@@ -20,7 +20,8 @@ class NoInternetWidget extends StatelessWidget {
               ),
               SizedBox(height: 8),
               Text(
-                'Проверьте подключение к интернету. При восстановлении соединения вы автоматически перейдёте в приложение.',
+                'Проверьте подключение к интернету или попробуйте позже. При восстановлении соединения вы автоматически перейдёте в приложение.',
+                textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
             ],

@@ -32,14 +32,11 @@ class WebviewWindowsState extends State<WebviewWindows> {
 
   Future<void> _initWebView() async {
     try {
+      await _controller.initialize();
       final isReachable = await checkSiteIsReachable(_currentUrl);
 
-      if (!isReachable) {
-        widget.onError(true);
-        return;
-      }
-
-      await _controller.initialize();
+      widget.onError(!isReachable);
+      if (!isReachable) return;
 
       _controller.url.listen((url) {
         setState(() {
@@ -58,7 +55,6 @@ class WebviewWindowsState extends State<WebviewWindows> {
 
       await _controller.loadUrl(_currentUrl);
     } catch (e) {
-      print('Error initializing WebView: $e');
       widget.onError(true);
     }
   }

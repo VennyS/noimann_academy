@@ -85,7 +85,7 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   FloatingBar? buildFloatingbar() {
-    if (_hasInternet && !_isWebViewLoading && !_hasLoadingError) return null;
+    if (!_hasInternet || _isWebViewLoading || _hasLoadingError) return null;
 
     return FloatingBar(onGoBack: _goBack, onRefresh: _refresh);
   }
@@ -99,17 +99,17 @@ class MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: Stack(
                 children: [
-                  if (_hasInternet && !_hasLoadingError)
+                  if (_hasInternet)
                     WebViewWidget(
                       key: _webViewKey,
                       baseProtocol: baseProtocol,
                       baseHost: baseHost,
                       onLoadingChanged: onLoadingChanged,
                       onError: onError,
-                    )
-                  else
+                    ),
+                  if (!_hasInternet || _hasLoadingError)
                     const NoInternetWidget(),
-                  if (_hasInternet && _isWebViewLoading) SplashScreen(),
+                  if (_isWebViewLoading) SplashScreen(),
                 ],
               ),
             ),
