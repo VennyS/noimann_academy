@@ -30,24 +30,21 @@ class WebviewWindowsState extends State<WebviewWindows> {
   Future<void> _initWebView() async {
     try {
       await _controller.initialize();
-      // Listen for URL changes
       _controller.url.listen((url) {
         setState(() {
           _currentUrl = url;
         });
-        // Restrict navigation
+
         if (!_isUrlAllowed(url)) {
           _controller.loadUrl('${widget.baseProtocol}${widget.baseHost}');
         }
       });
 
-      // Listen for loading state
       _controller.loadingState.listen((state) {
         final isLoading = state == LoadingState.loading;
         widget.onLoadingChanged(isLoading);
       });
 
-      // Load initial URL
       await _controller.loadUrl(_currentUrl);
     } catch (e) {
       print('Error initializing WebView: $e');
@@ -58,6 +55,14 @@ class WebviewWindowsState extends State<WebviewWindows> {
     final uri = Uri.parse(url);
     return uri.host == widget.baseHost ||
         uri.host.endsWith('.${widget.baseHost}');
+  }
+
+  void reload() {
+    _controller.reload();
+  }
+
+  void goBack() {
+    _controller.goBack();
   }
 
   @override

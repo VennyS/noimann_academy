@@ -20,10 +20,30 @@ class WebViewWidget extends StatefulWidget {
 }
 
 class WebViewWidgetState extends State<WebViewWidget> {
+  final GlobalKey<WebviewMobileState> _mobileKey = GlobalKey();
+  final GlobalKey<WebviewWindowsState> _windowsKey = GlobalKey();
+
+  void goBack() {
+    if (Platform.isWindows) {
+      _windowsKey.currentState?.goBack();
+    } else {
+      _mobileKey.currentState?.goBack();
+    }
+  }
+
+  void reload() {
+    if (Platform.isWindows) {
+      _windowsKey.currentState?.reload();
+    } else {
+      _mobileKey.currentState?.reload();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isWindows) {
       return WebviewWindows(
+        key: _windowsKey,
         baseProtocol: widget.baseProtocol,
         baseHost: widget.baseHost,
         onLoadingChanged: widget.onLoadingChanged,
@@ -32,6 +52,7 @@ class WebViewWidgetState extends State<WebViewWidget> {
 
     if (Platform.isAndroid || Platform.isMacOS || Platform.isIOS) {
       return WebviewMobile(
+        key: _mobileKey,
         baseProtocol: widget.baseProtocol,
         baseHost: widget.baseHost,
         onLoadingChanged: widget.onLoadingChanged,

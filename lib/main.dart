@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WebView App',
+      title: 'Noimann Academy',
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(),
     );
@@ -31,6 +31,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
+  final GlobalKey<WebViewWidgetState> _webViewKey =
+      GlobalKey<WebViewWidgetState>();
+
   bool _isWebViewLoading = true;
   bool _hasInternet = true;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
@@ -59,32 +62,66 @@ class MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
-  void dispose() {
-    _connectivitySubscription?.cancel();
-    super.dispose();
+  void _goBack() {
+    _webViewKey.currentState?.goBack();
+  }
+
+  void _refresh() {
+    _webViewKey.currentState?.reload();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          if (_hasInternet)
-            WebViewWidget(
-              baseProtocol: baseProtocol,
-              baseHost: baseHost,
-              onLoadingChanged: (isLoading) {
-                setState(() {
-                  _isWebViewLoading = isLoading;
-                });
-              },
-            )
-          else
-            const NoInternetWidget(),
-          if (_hasInternet && _isWebViewLoading) SplashScreen(),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  if (_hasInternet)
+                    WebViewWidget(
+                      key: _webViewKey,
+                      baseProtocol: baseProtocol,
+                      baseHost: baseHost,
+                      onLoadingChanged: (isLoading) {
+                        setState(() {
+                          _isWebViewLoading = isLoading;
+                        });
+                      },
+                    )
+                  else
+                    const NoInternetWidget(),
+                  if (_hasInternet && _isWebViewLoading) SplashScreen(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+      floatingActionButton:
+          _hasInternet && !_isWebViewLoading
+              ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: _goBack,
+                      icon: Icon(Icons.arrow_back),
+                    ),
+                    IconButton(onPressed: _refresh, icon: Icon(Icons.refresh)),
+                  ],
+                ),
+              )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
   }
 }

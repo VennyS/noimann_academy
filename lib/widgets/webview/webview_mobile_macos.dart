@@ -22,10 +22,9 @@ class WebviewMobileState extends State<WebviewMobile> {
   @override
   void initState() {
     super.initState();
-
     _controller =
         WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted) // Enable JavaScript
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
           ..setNavigationDelegate(
             NavigationDelegate(
               onPageStarted: (url) {
@@ -53,14 +52,18 @@ class WebviewMobileState extends State<WebviewMobile> {
           ..loadRequest(Uri.parse('${widget.baseProtocol}${widget.baseHost}'));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return WebViewWidget(controller: _controller);
+  void goBack() async {
+    if (await _controller.canGoBack()) {
+      _controller.goBack();
+    }
+  }
+
+  void reload() {
+    _controller.reload();
   }
 
   @override
-  void dispose() {
-    // No explicit disposal needed for WebViewController
-    super.dispose();
+  Widget build(BuildContext context) {
+    return WebViewWidget(controller: _controller);
   }
 }
