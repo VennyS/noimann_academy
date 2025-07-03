@@ -95,7 +95,7 @@ BEGIN
             VALUE "InternalName", "noimann_academy" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "noimann_academy.exe" "\0"
-            VALUE "ProductName", "noimann_academy" "\0"
+            VALUE "ProductName", "Noimann Academy" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
