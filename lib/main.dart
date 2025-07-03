@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:noimann_academy/constants.dart';
+import 'package:noimann_academy/widgets/floating_bar/floating_bar.dart';
 import 'package:noimann_academy/widgets/no_internet/no_internet.dart';
 import 'package:noimann_academy/widgets/splash_screen/splash_screen.dart';
 import 'package:noimann_academy/widgets/webview/webview.dart';
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WebView App',
+      title: 'Noimann Academy',
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(),
     );
@@ -31,15 +32,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
+  final GlobalKey<WebViewWidgetState> _webViewKey =
+      GlobalKey<WebViewWidgetState>();
+
   bool _isWebViewLoading = true;
   bool _hasInternet = true;
+  bool _hasLoadingError = true;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     _checkInternet();
-    // Listen for connectivity changes
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
       results,
     ) {
@@ -60,32 +64,66 @@ class MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
-  void dispose() {
-    _connectivitySubscription?.cancel();
-    super.dispose();
+  void _goBack() {
+    _webViewKey.currentState?.goBack();
+  }
+
+  void _refresh() {
+    _webViewKey.currentState?.reload();
+  }
+
+  void onLoadingChanged(bool isLoading) {
+    setState(() {
+      _isWebViewLoading = isLoading;
+    });
+  }
+
+  void onError(bool isError) {
+    setState(() {
+      _hasLoadingError = isError;
+    });
+  }
+
+  FloatingBar? buildFloatingbar() {
+    if (!_hasInternet || _isWebViewLoading || _hasLoadingError) return null;
+
+    return FloatingBar(onGoBack: _goBack, onRefresh: _refresh);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          if (_hasInternet)
-            WebViewWidget(
-              baseProtocol: baseProtocol,
-              baseHost: baseHost,
-              onLoadingChanged: (isLoading) {
-                setState(() {
-                  _isWebViewLoading = isLoading;
-                });
-              },
-            )
-          else
-            const NoInternetWidget(),
-          if (_hasInternet && _isWebViewLoading) SplashScreen(),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  if (_hasInternet)
+                    WebViewWidget(
+                      key: _webViewKey,
+                      baseProtocol: baseProtocol,
+                      baseHost: baseHost,
+                      onLoadingChanged: onLoadingChanged,
+                      onError: onError,
+                    ),
+                  if (!_hasInternet || _hasLoadingError)
+                    const NoInternetWidget(),
+                  if (_isWebViewLoading) SplashScreen(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+      floatingActionButton: buildFloatingbar(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:noimann_academy/lib/check_site_is_reacheble.dart';
 import 'package:webview_windows/webview_windows.dart';
 
 class WebviewWindows extends StatefulWidget {
@@ -7,10 +8,12 @@ class WebviewWindows extends StatefulWidget {
     required this.baseProtocol,
     required this.baseHost,
     required this.onLoadingChanged,
+    required this.onError,
   });
   final String baseProtocol;
   final String baseHost;
   final ValueChanged<bool> onLoadingChanged;
+  final ValueChanged<bool> onError;
 
   @override
   WebviewWindowsState createState() => WebviewWindowsState();
@@ -30,27 +33,29 @@ class WebviewWindowsState extends State<WebviewWindows> {
   Future<void> _initWebView() async {
     try {
       await _controller.initialize();
-      // Listen for URL changes
+      final isReachable = await checkSiteIsReachable(_currentUrl);
+
+      widget.onError(!isReachable);
+      if (!isReachable) return;
+
       _controller.url.listen((url) {
         setState(() {
           _currentUrl = url;
         });
-        // Restrict navigation
+
         if (!_isUrlAllowed(url)) {
           _controller.loadUrl('${widget.baseProtocol}${widget.baseHost}');
         }
       });
 
-      // Listen for loading state
       _controller.loadingState.listen((state) {
         final isLoading = state == LoadingState.loading;
         widget.onLoadingChanged(isLoading);
       });
 
-      // Load initial URL
       await _controller.loadUrl(_currentUrl);
     } catch (e) {
-      print('Error initializing WebView: $e');
+      widget.onError(true);
     }
   }
 
@@ -58,6 +63,14 @@ class WebviewWindowsState extends State<WebviewWindows> {
     final uri = Uri.parse(url);
     return uri.host == widget.baseHost ||
         uri.host.endsWith('.${widget.baseHost}');
+  }
+
+  void reload() {
+    _controller.reload();
+  }
+
+  void goBack() {
+    _controller.goBack();
   }
 
   @override

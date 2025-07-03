@@ -10,35 +10,59 @@ class WebViewWidget extends StatefulWidget {
     required this.baseProtocol,
     required this.baseHost,
     required this.onLoadingChanged,
+    required this.onError,
   });
   final String baseProtocol;
   final String baseHost;
   final ValueChanged<bool> onLoadingChanged;
+  final ValueChanged<bool> onError;
 
   @override
   WebViewWidgetState createState() => WebViewWidgetState();
 }
 
 class WebViewWidgetState extends State<WebViewWidget> {
+  final GlobalKey<WebviewMobileState> _mobileKey = GlobalKey();
+  final GlobalKey<WebviewWindowsState> _windowsKey = GlobalKey();
+
+  void goBack() {
+    if (Platform.isWindows) {
+      _windowsKey.currentState?.goBack();
+    } else {
+      _mobileKey.currentState?.goBack();
+    }
+  }
+
+  void reload() {
+    if (Platform.isWindows) {
+      _windowsKey.currentState?.reload();
+    } else {
+      _mobileKey.currentState?.reload();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isWindows) {
       return WebviewWindows(
+        key: _windowsKey,
         baseProtocol: widget.baseProtocol,
         baseHost: widget.baseHost,
         onLoadingChanged: widget.onLoadingChanged,
+        onError: widget.onError,
       );
     }
 
     if (Platform.isAndroid || Platform.isMacOS || Platform.isIOS) {
       return WebviewMobile(
+        key: _mobileKey,
         baseProtocol: widget.baseProtocol,
         baseHost: widget.baseHost,
         onLoadingChanged: widget.onLoadingChanged,
+        onError: widget.onError,
       );
     }
 
-    // Placeholder for other platforms
-    return const Center(child: Text('Platform not supported yet'));
+    return const Center(child: Text('Платформа ещё не поддерживается'));
   }
 }

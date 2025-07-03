@@ -5,22 +5,28 @@ class NoInternetWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.wifi_off, size: 64, color: Colors.red),
-          SizedBox(height: 16),
-          Text(
-            'No Internet Connection',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return Scaffold(
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.wifi_off, size: 64, color: Colors.red),
+              SizedBox(height: 16),
+              Text(
+                'Платформа недоступна',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Проверьте подключение к интернету или попробуйте позже. При восстановлении соединения вы автоматически перейдёте в приложение.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ],
           ),
-          SizedBox(height: 8),
-          Text(
-            'Please check your network and try again.',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-        ],
+        ),
       ),
     );
   }
