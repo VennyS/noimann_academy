@@ -104,45 +104,45 @@ jobs:
           name: macos-release
           path: build/macos/Build/Products/Release
 
-  # -------------------- iOS --------------------
-  build-ios:
-    name: Build · iOS
-    runs-on: macos-latest
+  # # -------------------- iOS --------------------
+  # build-ios:
+  #   name: Build · iOS
+  #   runs-on: macos-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
+  #     - name: Set up Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: ${{ env.FLUTTER_VERSION }}
+  #         channel: stable
 
-      - name: Install dependencies
-        run: flutter pub get
+  #     - name: Install dependencies
+  #       run: flutter pub get
 
-      - name: Build .xcarchive
-        run: flutter build ipa --release --no-codesign
+  #     - name: Build .xcarchive
+  #       run: flutter build ipa --release --no-codesign
 
-      - name: Export unsigned .ipa from .xcarchive
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath build/ios/archive/Runner.xcarchive \
-            -exportPath build/ios/ipa \
-            -exportOptionsPlist ExportOptions.plist || true
+  #     - name: Export unsigned .ipa from .xcarchive
+  #       run: |
+  #         xcodebuild -exportArchive \
+  #           -archivePath build/ios/archive/Runner.xcarchive \
+  #           -exportPath build/ios/ipa \
+  #           -exportOptionsPlist ExportOptions.plist || true
 
-      - name: Upload .ipa
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-ipa-unsigned
-          path: build/ios/ipa/*.ipa
+  #     - name: Upload .ipa
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ios-ipa-unsigned
+  #         path: build/ios/ipa/*.ipa
 
-      - name: Upload .xcarchive
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-xarchive
-          path: build/ios/archive/Runner.xcarchive
+  #     - name: Upload .xcarchive
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ios-xarchive
+  #         path: build/ios/archive/Runner.xcarchive
 
   # -------------------- RELEASE --------------------
   release:
@@ -151,7 +151,7 @@ jobs:
       - build-android
       - build-windows
       - build-macos
-      - build-ios
+      # - build-ios
     runs-on: ubuntu-latest
 
     steps:
@@ -168,6 +168,6 @@ jobs:
             artifacts/android-release/**
             artifacts/windows-release/**
             artifacts/macos-release/**
-            artifacts/ios-xarchive/**
+            # artifacts/ios-release/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
