@@ -60,6 +60,8 @@ flutter_native_splash:
   image: assets/images/logo_above_text.png
   android: true
   ios: true
+  ios_content_mode: scaleAspectFit
+  android_gravity: center
 
 flutter_launcher_icons:
   image_path: "assets/images/logo_without_text.png"
